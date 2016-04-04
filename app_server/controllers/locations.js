@@ -3,7 +3,7 @@ module.exports.list_locations=function(req,res){
 }
 
 module.exports.details=function(req,res){
-    res.render('list_locations',{title:'Details'});
+    res.render('location_details',{title:'Details'});
 }
 
 module.exports.review=function(req,res){
