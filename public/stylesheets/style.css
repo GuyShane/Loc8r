@@ -15,5 +15,9 @@
 }
 
 .review-timestamp {
-    color: #ccc;
+    color: #bbb;
+}
+
+.review-text {
+    margin-left: 10px;
 }

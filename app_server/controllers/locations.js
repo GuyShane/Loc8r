@@ -7,5 +7,5 @@ module.exports.details=function(req,res){
 }
 
 module.exports.review=function(req,res){
-    res.render('list_locations',{title:'New review'});
+    res.render('add_review',{title:'New review'});
 }
