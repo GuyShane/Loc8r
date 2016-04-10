@@ -1,78 +1,61 @@
 extends layout
 
+include _includes/jade_mixins
+mixin make_map(lat,lon)
+  img.img-responsive.img-rounded(src='http://maps.googleapis.com/maps/api/staticmap?center=#{lat},+#{lon}&zoom=16&scale=false&size=600x300&maptype=roadmap&format=png&visual_refresh=true&markers=size:mid%7Ccolor:0xff0000%7Clabel:%7C#{lat},+#{lon}')
+
 block content
   .row.page-header
     .col-lg-12
-      h1 Starcups
+      h1= location_info.name
   .row
     .col-xs-12.col-md-9
       .row
         .col-xs-12.col-sm-6
           p.rating
-            span.glyphicon.glyphicon-star
-            span.glyphicon.glyphicon-star
-            span.glyphicon.glyphicon-star
-            span.glyphicon.glyphicon-star-empty
-            span.glyphicon.glyphicon-star-empty
-          p 125 High Street, Reading, RG6 1PS
+            +make_rating(location_info.rating)
+          p= location_info.address
             .panel.panel-primary
               .panel-heading
-                h2.panel-title Opening Hours
+                h2.panel-title= panel_headers.hours
               .panel-body
-                p Monday - Friday: 7:00am-7:00pm
-                p Saturday: 8:00am-5:00pm
-                p Sunday: closed
+                each hour in location_info.hours
+                  if hour.closed
+                    p #{hour.period}: closed
+                  else
+                    p #{hour.period}: #{hour.open}-#{hour.close}
             .panel.panel-primary
               .panel-heading
-                h2.panel-title Facilities
+                h2.panel-title= panel_headers.facilities
               .panel-body
-                span.label.label-warning
-                  span.glyphicon.glyphicon-ok
-                  | &nbsp;Hot drinks
-                | &nbsp;
-                .span.label.label-warning
-                  span.glyphicon.glyphicon-ok
-                  | &nbsp;Food
-                | &nbsp;
+                each facility in location_info.facilities
+                  span.label.label-warning
+                    span.glyphicon.glyphicon-ok
+                    | &nbsp;#{facility}
+                  | &nbsp;
         .col-xs-12.col-sm-6.location-map
           .panel.panel-primary
             .panel-heading
-              h2.panel-title Location map
+              h2.panel-title= panel_headers.map
             .panel-body
-              img.img-responsive.img-rounded(src='http://maps.googleapis.com/maps/api/staticmap?center=51.455041,+-0.9690884&zoom=16&scale=false&size=600x300&maptype=roadmap&format=png&visual_refresh=true&markers=size:mid%7Ccolor:0xff0000%7Clabel:%7C51.455041,+-0.9690884')
+              +make_map(location_info.location.lat,location_info.location.lon)
       .row
         .col-xs-12
           .panel.panel-primary.review-panel
             .panel-heading
-              a.btn.btn-default.pull-right(href='/location/review/new') Add review
-              h2.panel-title Customer reviews
+              a.btn.btn-default.pull-right(href='/location/review/new')= add_review
+              h2.panel-title= panel_headers.reviews
             .panel-body.review-container
-              .row
-                .review
-                  .well.well-sm.review-header
-                    span.rating
-                      span.glyphicon.glyphicon-star
-                      span.glyphicon.glyphicon-star
-                      span.glyphicon.glyphicon-star
-                      span.glyphicon.glyphicon-star
-                      span.glyphicon.glyphicon-star
-                    span.review-author Simon Holmes
-                    small.review-timestamp 16 July 2013
-                  .col-xs-12
-                    p.review-text What a great place. Couldn't be more happy with it.
-              .row
-                .review
-                  .well.well-sm.review-header
-                    span.rating
-                      span.glyphicon.glyphicon-star
-                      span.glyphicon.glyphicon-star
-                      span.glyphicon.glyphicon-star
-                      span.glyphicon.glyphicon-star-empty
-                      span.glyphicon.glyphicon-star-empty
-                    span.review-author Charlie Chaplin
-                    small.review-timestamp 22 June 2013
-                  .col-xs-12
-                    p.review-text It was all right. Decent WiFi I guess.
+              each review in reviews
+                .row
+                  .review
+                    .well.well-sm.review-header
+                      span.rating
+                        +make_rating(review.rating)
+                      span.review-author= review.author
+                      small.review-timestamp= review.date
+                    .col-xs-12
+                      p.review-text!= (review.review).replace(/\n/g,'<br />')
     .col-xs-12.col-md-3
-      p.lead Starcups is on Loc8r because it has accessible WiFi and space to sit down with your laptop or whatever.
-      p If you've been and enjoyed it - or if you didn't - leave a review and let other know what you think!
+      p.lead= sidebar.main
+      p= sidebar.under
