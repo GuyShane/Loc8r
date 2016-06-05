@@ -1,3 +1,11 @@
+var request=require('request');
+var api_opts={
+    server: 'http://localhost:3000'
+};
+if (process.env.NODE_ENV==='production'){
+    api_opts.server='https://mighty-chamber-28530.herokuapp.com/';
+}
+
 module.exports.list_locations=function(req,res){
     res.render('list_locations',{
 	title: 'Loc8r - Find places to work',
