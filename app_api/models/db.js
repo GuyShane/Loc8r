@@ -3,7 +3,7 @@ require('./locations');
 
 var db_uri='mongodb://localhost/Loc8r';
 if (process.env.NODE_ENV==='production'){
-    db_uri=process.env.MONGOLAB_URI;
+    db_uri=process.env.MONGODB_URI;
 }
 mongoose.connect(db_uri);
 
