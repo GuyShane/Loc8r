@@ -24,17 +24,18 @@ var make_location_list=function(results){
 module.exports.list_by_distance=function(req,res){
     var lon=parseFloat(req.query.lon);
     var lat=parseFloat(req.query.lat);
+    var max_dist=parseFloat(req.query.max_dist);
     var point={
 	type: 'Point',
 	coordinates: [lon,lat]
     };
     var opts={
 	spherical: true,
-	maxDistance: 20000,
+	maxDistance: max_dist,
 	num: 10
     };
-    if (!lon || !lat){
-	send_response(res,404,{'message':'You must specify a latitude and longitude'});
+    if (!lon || !lat || !max_dist){
+	send_response(res,404,{'message':'You must specify a latitude, longitude, and distance'});
 	return;
     }
     Loc.geoNear(point,opts,function(err,results,stats){

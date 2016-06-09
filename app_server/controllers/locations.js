@@ -6,7 +6,7 @@ if (process.env.NODE_ENV==='production'){
     api_opts.server='https://mighty-chamber-28530.herokuapp.com/';
 }
 
-module.exports.list_locations=function(req,res){
+function render_list(req,res,locations){
     res.render('list_locations',{
 	title: 'Loc8r - Find places to work',
 	header: {
@@ -14,29 +14,39 @@ module.exports.list_locations=function(req,res){
 	    tagline: 'Find places to work near you with WiFi!',
 	},
 	sidebar: 'Looking for WiFi and a seat? Loc8r helps you find places to work when out and about. Perhaps with coffee, cake, or a pint? Let Loc8r help you find the place you\'re looking for.',
-	locations: [
-	    {
-		name: 'Starcups',
-		rating: 3,
-		address: '125 High Street, Reading, RG5 TP2',
-		facilities: ['Hot drinks','food','Premium WiFi'],
-		distance: '100m'
-	    },
-	    {
-		name: 'Cap\'n coffee',
-		rating: 4,
-		address: '125 High Street, Reading, RG5 TP2',
-		facilities: ['Hot drinks','food','Premium WiFi','Pirate theme'],
-		distance: '225m'
-	    },
-	    {
-		name: 'Drink up',
-		rating: 2,
-		address: '125 High Street, Reading, RG5 TP2',
-		facilities: ['Hot drinks','WiFi'],
-		distance: '82m'
-	    },
-	],
+	locations: locations
+    });
+}
+
+function format_dist(dist){
+    dist=parseFloat(dist);
+    if (dist>1000){
+	dist/=1000;
+	return dist.toFixed(1)+'km';
+    }
+    return dist.toFixed(0)+'m';
+}
+
+module.exports.list_locations=function(req,res){
+    const req_opts={
+	url: api_opts.server+'/api/locations',
+	method: 'GET',
+	json: {},
+	qs: {
+	    lat: 53.5020721,
+	    lon: -113.4817427,
+	    max_dist: 2000
+	}
+    };
+    request(req_opts,(err,response,body)=>{
+	if (err){
+	    console.log(err);
+	}
+	const locations=body;
+	for (let l of locations){
+	    l.distance=format_dist(l.distance);
+	}
+	render_list(req,res,locations);
     });
 }
 
