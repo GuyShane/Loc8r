@@ -7,6 +7,14 @@ if (process.env.NODE_ENV==='production'){
 }
 
 function render_list(req,res,locations){
+    let message;
+    if (!(locations instanceof Array)){
+	message='API lookup error';
+	locations=[];
+    }
+    else if (!locations.length){
+	message='No places found nearby';
+    }
     res.render('list_locations',{
 	title: 'Loc8r - Find places to work',
 	header: {
@@ -14,6 +22,7 @@ function render_list(req,res,locations){
 	    tagline: 'Find places to work near you with WiFi!',
 	},
 	sidebar: 'Looking for WiFi and a seat? Loc8r helps you find places to work when out and about. Perhaps with coffee, cake, or a pint? Let Loc8r help you find the place you\'re looking for.',
+	message: message,
 	locations: locations
     });
 }
@@ -43,8 +52,10 @@ module.exports.list_locations=function(req,res){
 	    console.log(err);
 	}
 	const locations=body;
-	for (let l of locations){
-	    l.distance=format_dist(l.distance);
+	if (response.statusCode===200 && locations.length){
+	    for (let l of locations){
+		l.distance=format_dist(l.distance);
+	    }
 	}
 	render_list(req,res,locations);
     });
