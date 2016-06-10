@@ -61,49 +61,36 @@ module.exports.list_locations=function(req,res){
     });
 }
 
-module.exports.details=function(req,res){
+function render_details(req,res,details){
     res.render('location_details',{
-	title:'Details - Starcups',
-	location_info: {
-	    name: 'Starcups',
-	    address: '125 High Street, Reading, RG5 TP2',
-	    location: {
-		lat: 51.455041,
-		lon: -0.9690884
-	    },
-	    rating: '3',
-	    hours: [
-		{period: 'Monday - Friday', open: '7:00am', close: '7:00pm', closed: false},
-		{period: 'Saturday', open: '8:00am', close: '5:00pm', closed: false},
-		{period: 'Sunday', closed: true}
-	    ],
-	    facilities: ['Hot drinks','food','Premium WiFi']
-	},
+	title:'Details - '+details.name,
+	location_info: details,
 	panel_headers: {
 	    hours: 'Opening Hours',
 	    map: 'Location Map',
 	    facilities: 'Facilities',
 	    reviews: 'Customer Reviews'
 	},
-	reviews: [
-	    {
-		author: 'Simon Holmes',
-		rating: 5,
-		date: '16 June 2013',
-		review: 'What a great place. Can\'t say enough good things'
-	    },
-	    {
-		author: 'Charlie Chaplin',
-		rating: 3,
-		date: '24 September 2013',
-		review: 'It\'s all right. Decent WiFi I guess'
-	    }
-	],
 	add_review: 'Add Review',
 	sidebar: {
-	    main: 'Starcups is on Loc8r because it has accessible WiFi and space to sit down with your laptop or whatever.',
+	    main: `${details.name} is on Loc8r because it has accessible WiFi and space to sit down with your laptop or whatever.`,
 	    under: 'If you\'ve been and enjoyed it - or if you didn\'t - leave a review and let other know what you think!'
 	}
+    });
+}
+
+module.exports.details=function(req,res){
+    const req_opts={
+	url: api_opts.server+'/api/locations/'+req.params.locationid,
+	method: 'GET',
+	json: {}
+    };
+    request(req_opts,(err,response,body)=>{
+	body.location={
+	    lat: body.coords[1],
+	    lon: body.coords[0]
+	};
+	render_details(req,res,body);
     });
 }
 
