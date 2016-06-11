@@ -79,6 +79,19 @@ function render_details(req,res,details){
     });
 }
 
+function show_error(req,res,sc){
+    const data={};
+    if (sc===404){
+	data.title='404, Page not found';
+	data.message='Yoopsies. We couldn\'t find what you wanted. It was probably your fault, honestly.';
+    }
+    else {
+	data.title='Oh crimeny';
+	data.message='Looks like something went wrong. Go somewhere else or something';
+    }
+    res.render('error_page',data);
+}
+
 module.exports.details=function(req,res){
     const req_opts={
 	url: api_opts.server+'/api/locations/'+req.params.locationid,
@@ -86,11 +99,19 @@ module.exports.details=function(req,res){
 	json: {}
     };
     request(req_opts,(err,response,body)=>{
-	body.location={
-	    lat: body.coords[1],
-	    lon: body.coords[0]
-	};
-	render_details(req,res,body);
+	if (response.statusCode!=200){
+	    show_error(req,res,response.statusCode);
+	}
+	else {
+	    body.location={
+		lat: body.coords[1],
+		lon: body.coords[0]
+	    };
+	    for (let r of body.reviews){
+		r.date=new Date(r.date).toDateString();
+	    }
+	    render_details(req,res,body);
+	}
     });
 }
 
